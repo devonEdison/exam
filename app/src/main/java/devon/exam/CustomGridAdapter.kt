@@ -32,7 +32,7 @@ class CustomGridAdapter(
         private val idTextView = itemView.grid_id
         private val titleTextView = itemView.grid_title
         private val thumbnailUrlTextView = itemView.grid_thumbnailUrl
-        val layout = itemView.gridLayout
+        val layout = itemView.gridLayout!!
         var asyncTask: AsyncTask<String, Void, Bitmap>? = null
         var customerExecutorService: ExecutorService? = null
 
