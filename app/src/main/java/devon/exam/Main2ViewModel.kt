@@ -1,11 +1,9 @@
 package devon.exam
 
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import devon.exam.model.TypicodePhotos
 import devon.exam.network.ApiStation
 import devon.exam.network.SingleLiveEvent
-import devon.exam.model.TypicodePhotos
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
