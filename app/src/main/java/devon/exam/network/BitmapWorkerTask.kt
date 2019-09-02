@@ -60,13 +60,16 @@ class BitmapWorkerTask(
 
     private fun downloadImage(URL: String): Bitmap? {
         var bitmap: Bitmap? = null
-        val input: InputStream?
+        var input: InputStream?=null
         try {
             input = openHttpConnection(URL)
-            bitmap = BitmapFactory.decodeStream(input)
-            addBitmapToMemoryCache(URL, bitmap)
-            input!!.close()
+            if (input != null) {
+                bitmap = BitmapFactory.decodeStream(input)
+                addBitmapToMemoryCache(URL, bitmap)
+            }
         } catch (e1: IOException) {
+        }finally {
+            input?.close()
         }
 
         return bitmap
@@ -89,7 +92,9 @@ class BitmapWorkerTask(
             val httpConn = conn as HttpURLConnection
             httpConn.requestMethod = "GET"
             httpConn.connect()
-
+            if (isCancelled) {
+                return null
+            }
             if (httpConn.responseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = httpConn.inputStream
             }
