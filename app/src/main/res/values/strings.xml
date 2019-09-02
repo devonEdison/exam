@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">exam</string>
+    <string name="button">Button</string>
+    <string name="backgroundimage">backgroundImage</string>
+</resources>
