@@ -7,19 +7,16 @@ import android.graphics.drawable.BitmapDrawable
 import android.os.AsyncTask
 import android.view.ViewGroup
 import androidx.collection.LruCache
-import com.bumptech.glide.disklrucache.DiskLruCache
-import devon.exam.R
 import java.io.IOException
 import java.io.InputStream
 import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.locks.ReentrantLock
 
 class BitmapWorkerTask(
     context: Context,
     layout: ViewGroup,
-    val memoryCache: LruCache<String, Bitmap>
+    private val memoryCache: LruCache<String, Bitmap>
 ) : AsyncTask<String, Void, Bitmap>() {
 
     private val layoutReference: WeakReference<ViewGroup>?

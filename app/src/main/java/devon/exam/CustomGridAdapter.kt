@@ -33,7 +33,8 @@ class CustomGridAdapter(
         private val titleTextView = itemView.grid_title
         private val thumbnailUrlTextView = itemView.grid_thumbnailUrl
         val layout = itemView.gridLayout
-        var asyncTask:AsyncTask<String, Void, Bitmap>? = null
+        var asyncTask: AsyncTask<String, Void, Bitmap>? = null
+        var customerExecutorService: ExecutorService? = null
 
         fun bind(item: TypicodePhotos) {
             idTextView.text = item.id.toString()
@@ -46,8 +47,7 @@ class CustomGridAdapter(
 
     init {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
-        val cacheSize = maxMemory
-        memoryCache = object : LruCache<String, Bitmap>(cacheSize) {
+        memoryCache = object : LruCache<String, Bitmap>(maxMemory) {
 
             override fun sizeOf(key: String, bitmap: Bitmap): Int {
                 return bitmap.byteCount / 1024
@@ -76,24 +76,29 @@ class CustomGridAdapter(
 
     @Suppress("DEPRECATION")
     private fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        if (viewHolder.asyncTask != null) {
-            viewHolder.asyncTask!!.cancel(true)
-        }
-        getBitmapFromMemCache(photos[position].thumbnailUrl)?.also {
-            val image = BitmapDrawable(context.resources, it)
-            viewHolder.layout.background = image
-        } ?: run {
-            viewHolder.layout.setBackgroundColor(context.resources.getColor(android.R.color.white))
-            val customerExecutorService: ExecutorService =
-                ThreadPoolExecutor(
-                    5, 5, 0, TimeUnit.MILLISECONDS,
+        viewHolder.apply {
+            if (asyncTask != null) {
+                asyncTask!!.cancel(true)
+            }
+            if (customerExecutorService != null) {
+                customerExecutorService!!.shutdown()
+            }
+            getBitmapFromMemCache(photos[position].thumbnailUrl)?.also {
+                val image = BitmapDrawable(context.resources, it)
+                layout.background = image
+            } ?: run {
+                layout.setBackgroundColor(context.resources.getColor(android.R.color.white))
+                customerExecutorService = ThreadPoolExecutor(
+                    5, 9, 0, TimeUnit.MILLISECONDS,
                     LinkedBlockingDeque<Runnable>()
                 )
-            viewHolder.asyncTask = BitmapWorkerTask(context, viewHolder.layout, memoryCache)
+                asyncTask = BitmapWorkerTask(context, layout, memoryCache)
+//                .execute(photos[position].thumbnailUrl) // loading speed too slow
                     .executeOnExecutor(customerExecutorService, photos[position].thumbnailUrl)
-            callback.onSuccess(viewHolder.asyncTask!!)
+                callback.onSuccess(asyncTask!!)
+            }
+            bind(getItem(position))
         }
-        viewHolder.bind(getItem(position))
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
