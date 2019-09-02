@@ -27,7 +27,7 @@ class BitmapWorkerTask(
     private lateinit var imageUrl: String
 
     init {
-        // Use a WeakReference to ensure the ImageView can be garbage collected
+        // Use a WeakReference to ensure the view can be garbage collected
         layoutReference = WeakReference(layout)
         this.context = WeakReference(context)
     }
